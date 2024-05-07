@@ -3,6 +3,7 @@ package com.github.falydoor.limesurveyrc.dto.json;
 
 import java.lang.reflect.Type;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.github.falydoor.limesurveyrc.dto.LsResponse;
 import com.google.gson.GsonBuilder;
@@ -19,7 +20,9 @@ public class LsResponseDeserializer implements JsonDeserializer<LsResponse> {
     @Override
     public LsResponse deserialize(JsonElement jsonElement, Type type, 
     		JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-    	LsResponse response = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateDeserializer())
+    	LsResponse response = new GsonBuilder()
+    			.registerTypeAdapter(LocalDate.class, new LocalDateDeserializer())
+    			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
                 .create().fromJson(jsonElement, type);
     	return response;
     }

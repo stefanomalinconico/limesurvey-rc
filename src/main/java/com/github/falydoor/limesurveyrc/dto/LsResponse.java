@@ -3,6 +3,7 @@ package com.github.falydoor.limesurveyrc.dto;
 import com.google.gson.annotations.SerializedName;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Response DTO.
@@ -18,8 +19,8 @@ public class LsResponse {
     private Integer lastpage;
 
     @SerializedName("submitdate")
-    private LocalDate submitDate;
-
+    private LocalDateTime submitDate;
+    
     private String seed;
     
     @SerializedName("startdate")
@@ -87,11 +88,11 @@ public class LsResponse {
 		this.lastpage = lastpage;
 	}
 
-	public LocalDate getSubmitDate() {
+	public LocalDateTime getSubmitDate() {
 		return submitDate;
 	}
 
-	public void setSubmitDate(LocalDate submitDate) {
+	public void setSubmitDate(LocalDateTime submitDate) {
 		this.submitDate = submitDate;
 	}
 

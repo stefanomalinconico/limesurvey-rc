@@ -10,7 +10,9 @@ import com.github.falydoor.limesurveyrc.dto.json.LsSurveyDeserializer;
 import com.github.falydoor.limesurveyrc.exception.LimesurveyRCException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
@@ -32,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Stream;
 
 /**
@@ -343,9 +346,30 @@ public class LimesurveyRC {
 		JsonElement result = this.callRC(new LsApiBody("export_responses", params));
 		String resultBase64Decoded = new String(Base64.getDecoder().decode(result.getAsString()),
 				StandardCharsets.UTF_8);
-		result = new JsonParser().parse(resultBase64Decoded).getAsJsonObject().get("responses");
+		JsonObject jsonObject = new JsonParser().parse(resultBase64Decoded).getAsJsonObject();
+		result = jsonObject.get("responses");
 		List<LsResponse> responses = gson.fromJson(result, new TypeToken<List<LsResponse>>() {
 		}.getType());
+		
+		
+		//soluçao de contorno porque limesurvey produção tá em versao bem mais velha que HML
+		if (responses != null && !responses.isEmpty() && responses.get(0).getId() == 0) {
+			
+			
+			List<Set<Entry<String, JsonElement>>> listaEntradas = new ArrayList<Set<Entry<String, JsonElement>>>();
+			for (JsonElement respostaComIdExterno : (JsonArray)result) {
+				Set<Entry<String, JsonElement>> entrySet = respostaComIdExterno.getAsJsonObject().entrySet();
+				listaEntradas.add(entrySet);
+			}
+			
+			final List<JsonElement> respostas = new ArrayList<JsonElement>();
+			
+			listaEntradas.stream().forEach(setEntrada -> setEntrada.stream().forEach(entrada -> respostas.add(entrada.getValue())));
+			
+			
+			responses.clear();
+			respostas.forEach(resposta -> responses.add(gson.fromJson(resposta, new TypeToken<LsResponse>() {}.getType())));
+		}
 
 		return responses.stream();
 	}
